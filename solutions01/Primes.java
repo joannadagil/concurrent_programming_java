@@ -5,6 +5,8 @@ public class Primes {
     private static final int END = 10000;
     private static final int NONE = 0;
 
+    private static final int DIFF = 30;
+
     private static volatile int foundDivisor;
 
     public static boolean isPrime(int n) {
@@ -25,7 +27,7 @@ public class Primes {
         Thread[] threads = new Thread[starts.length];
 
         for(int i = 0; i < starts.length; i++) {
-            threads[i] = new Thread(new Helper(starts[i]));
+            threads[i] = new Thread(new Helper(n, starts[i]));
             threads[i].start();
         }
 
@@ -36,27 +38,38 @@ public class Primes {
             }
         }
 
-        if(foundDivisor > 0) { return false; }
-        else { return true; }
+        return foundDivisor == 0;
     }
 
     private static class Helper implements Runnable {
 
-        int value;
+        int n, c;
 
-        public Helper(int v) {
-            this.value = v;
+        public Helper(int n, int c) {
+            this.n = n;
+            this.c = c;
         }
 
         @Override
         public void run() {
-
+            if (foundDivisor == 0) {
+                if (n % c == 0) {
+                    foundDivisor = 1;
+                } else {
+                    c = c + DIFF;
+                    if (c < n)
+                        this.run();
+                }
+            }
         }
     }
 
     // FIXME: adding a class for helper threads may be convenient
     
     public static void main(String[] args) {
+
+        System.out.println("aaaaa");
+
         int primesCount = 0;
         for (int i = 2; i <= END; ++i) {
             if (isPrime(i)) {
